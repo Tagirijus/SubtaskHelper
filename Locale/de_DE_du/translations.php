@@ -2,6 +2,7 @@
 
 return array(
     'Subtask helper' => 'Unteraufgaben Helfer',
+    'Converter' => 'Konvertierer',
     'Adds features to do stuff with subtasks' => 'Fügt Features hinzu, um Dinge mit Unteraufgaben zu tun',
     'Subtask from task times' => 'Unteraufgabe von Aufgaben-Zeiten',
     'Subtask name' => 'Unteraufgabe Name',

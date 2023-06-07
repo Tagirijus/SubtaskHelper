@@ -1,5 +1,5 @@
 <div class="page-header">
-    <h2><?= t('Subtask helper') ?></h2>
+    <h2><?= t('Subtask helper') . ' - ' . t('Converter') ?></h2>
 </div>
 <form method="post" action="<?= $this->url->href('SubtaskHelperController', 'convertExecute', ['plugin' => 'SubtaskHelper', 'task_id' => $task['id'], 'project_id' => $task['project_id']]) ?>" autocomplete="off">
     <?= $this->form->csrf() ?>
