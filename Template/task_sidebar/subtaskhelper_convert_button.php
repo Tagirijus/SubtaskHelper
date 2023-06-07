@@ -1,6 +1,6 @@
 <?php
 
-$html = '<i class="fa fa-clock-o fa-fw js-modal-small" aria-hidden="true"></i>' . t('Subtask from task times');
+$html = '<i class="fa fa-arrow-right fa-fw js-modal-small" aria-hidden="true"></i>' . t('Subtask from task times');
 $href = $this->helper->url->href(
     'SubtaskHelperController',
     'convertModal',

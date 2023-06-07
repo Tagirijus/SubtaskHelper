@@ -15,6 +15,10 @@ class Plugin extends Base
             'template:task:sidebar:actions',
             'SubtaskHelper:task_sidebar/subtaskhelper_convert_button'
         );
+        $this->template->hook->attach(
+            'template:task:sidebar:actions',
+            'SubtaskHelper:task_sidebar/subtaskhelper_combine_button'
+        );
     }
 
     public function onStartup()
