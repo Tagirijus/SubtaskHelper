@@ -1,7 +1,15 @@
 # Changelog
 
 
-## v1.0
+## v1.2
+
+### What's Changed
+
+_(most recent changes are listed on top):_
+- Added feature to be able to open modal to select a subtask to edit
+
+
+## v1.1
 
 ### What's Changed
 
