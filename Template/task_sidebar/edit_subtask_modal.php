@@ -38,7 +38,7 @@
                 placeholder="workaround for autofocus"
                 autofocus
             > -->
-            <?= $this->form->select('subtask', $prepared_subtasks, $values, [], ['utofocus']) ?>
+            <?= $this->form->select('subtask', $prepared_subtasks, $values, [], ['autofocus']) ?>
         </div>
 
         <div class="task-form-bottom">
