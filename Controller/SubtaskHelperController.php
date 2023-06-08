@@ -42,7 +42,7 @@ class SubtaskHelperController extends \Kanboard\Controller\PluginController
         $this->checkCSRFForm();
 
         if ($hasSubtasks) {
-            $this->flash->success(t('Task already has subtasks'));
+            $this->flash->failure(t('Task already has subtasks'));
         } else {
             $form = $this->request->getValues();
 
