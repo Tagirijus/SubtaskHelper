@@ -10,6 +10,9 @@ class Plugin extends Base
 {
     public function initialize()
     {
+        // Helper
+        $this->helper->register('subtaskHelperHelper', '\Kanboard\Plugin\SubtaskHelper\Helper\SubtaskHelperHelper');
+
         // Views - Template Hook
         $this->template->hook->attach(
             'template:task:sidebar:actions',
@@ -19,6 +22,11 @@ class Plugin extends Base
             'template:task:sidebar:actions',
             'SubtaskHelper:task_sidebar/subtaskhelper_combine_button'
         );
+
+        // Reference hook
+        $this->hook->on('model:subtask:creation:prepare', function ($values) {
+            $this->logger->info(json_encode($values));
+        });
     }
 
     public function onStartup()
