@@ -161,4 +161,56 @@ class SubtaskHelperController extends \Kanboard\Controller\PluginController
 
         return $this->response->redirect($this->helper->url->to('TaskViewController', 'show', ['task_id' => $task['id']]), true);
     }
+
+    /**
+     * Show the modal for selecting the subtask.
+     *
+     * @return HTML response
+     */
+    public function selectSubtask()
+    {
+        $task = $this->getTask();
+        $subtasks = $this->subtaskModel->getAllByTaskIds([$task['id']]);
+
+        if (empty($subtasks)) {
+            $this->flash->success(t('No subtasks available'));
+            return $this->response->redirect($this->helper->url->to('TaskViewController', 'show', ['task_id' => $task['id']]), true);
+        }
+
+        $user = $this->getUser();
+
+        if ($user['username'] !== $task['assignee_username']) {
+            throw new AccessForbiddenException();
+        }
+
+        $this->response->html($this->template->render(
+            'SubtaskHelper:task_sidebar/edit_subtask_modal', [
+                'task' => $task,
+                'user' => $user,
+                'subtasks' => $subtasks,
+            ]
+        ));
+    }
+
+    /**
+     * Open the edit modal for the selected subtask.
+     *
+     * @return HTML response
+     */
+    public function editSubtask()
+    {
+        $task = $this->getTask();
+        $form = $this->request->getValues();
+        $subtask = $this->subtaskModel->getById($form['subtask']);
+
+        return $this->response->html($this->template->render('subtask/edit', array(
+            'values' => $subtask,
+            'errors' => [],
+            'users_list' => $this->projectUserRoleModel->getAssignableUsersList($task['project_id']),
+            'status_list' => $this->subtaskModel->getStatusList(),
+            'subtask' => $subtask,
+            'task' => $task,
+        )));
+        // return $this->response->redirect($this->helper->url->to('SubtaskController', 'edit', ['task_id' => $task['id'], 'subtask_id' => $form['subtask']]), true);
+    }
 }
