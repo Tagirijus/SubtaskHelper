@@ -25,7 +25,7 @@ class Plugin extends Base
 
         // Reference hook
         $this->hook->on('model:subtask:creation:prepare', function ($values) {
-            $this->logger->info(json_encode($values));
+            // $this->logger->info(json_encode($values));
         });
     }
 
