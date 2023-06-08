@@ -8,6 +8,19 @@ use Kanboard\Core\Base;
 class SubtaskHelperHelper extends Base
 {
     /**
+     * Get configuration for plugin as array.
+     *
+     * @return array
+     */
+    public function getConfig()
+    {
+        return [
+            'title' => t('SubtaskHelper') . ' &gt; ' . t('Settings'),
+            'enable_times_syntax' => $this->configModel->get('subtaskhelper_enable_times_syntax', 1),
+        ];
+    }
+
+    /**
      * Get only the done subtasks from the given subtasks.
      *
      * @param  array $subtasks
@@ -99,5 +112,55 @@ class SubtaskHelperHelper extends Base
             }
         }
         return true;
+    }
+
+    /**
+     * Interpretes a given subtask title this way:
+     *
+     * [title]:[estimated time]
+     *
+     * So it splits the title string by the first ":".
+     * Left site is the title and the right site is
+     * a time string like 0:45, 0.75 or 0,75.
+     *
+     * It then changes the title of the given subtask
+     * to this and also changes the estimated time.
+     *
+     * @param  array &$values
+     * @return array
+     */
+    public function prepareSubtaskByTimesSyntax(&$values)
+    {
+        if ($this->configModel->get('subtaskhelper_enable_times_syntax', 1) == 1) {
+            $split = explode(':', $values['title'], 2);
+            $values['title'] = trim($split[0]);
+            if (isset($split[1])) {
+                $values['time_estimated'] = $this->parseTime(trim($split[1]));
+            }
+        }
+        return $values;
+    }
+
+    /**
+     * This function is for interpreting the given time
+     * input string.
+     *
+     * @param  string $time
+     * @return float
+     */
+    private function parseTime($time)
+    {
+        // for the german freaks like me, who might use , instead of .
+        $time = str_replace(',', '.', $time);
+
+        // maybe it's a time formatted string like "1:45" ...
+        if (strpos($time, ':') !== false) {
+            // ... then convert it to a float
+            $hours = explode(':', $time)[0];
+            $minutes = explode(':', $time)[1];
+            $time = (float) $hours + (float) $minutes / 60;
+        }
+
+        return (float) $time;
     }
 }

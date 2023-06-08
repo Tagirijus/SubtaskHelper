@@ -8,6 +8,42 @@ use Kanboard\Core\Controller\AccessForbiddenException;
 class SubtaskHelperController extends \Kanboard\Controller\PluginController
 {
     /**
+     * Settins page for the SubtaskHelper plugin.
+     *
+     * @return HTML response
+     */
+    public function showConfig()
+    {
+        // !!!!!
+        // When I want to add new config options, I also have to add them
+        // in the SubtaskHelperHelper.php in the getConfig() Method !
+        // !!!!!
+        $this->response->html($this->helper->layout->config('SubtaskHelper:config/subtaskhelper_config', $this->helper->subtaskHelperHelper->getConfig()));
+    }
+
+    /**
+     * Save the setting for SubtaskHelper.
+     */
+    public function saveConfig()
+    {
+        $form = $this->request->getValues();
+
+        $values = [
+            'subtaskhelper_enable_times_syntax' => isset($form['enable_times_syntax']) ? 1 : 0,
+        ];
+
+        $this->languageModel->loadCurrentLanguage();
+
+        if ($this->configModel->save($values)) {
+            $this->flash->success(t('Settings saved successfully.'));
+        } else {
+            $this->flash->failure(t('Unable to save your settings.'));
+        }
+
+        return $this->response->redirect($this->helper->url->to('SubtaskHelperController', 'showConfig', ['plugin' => 'SubtaskHelper']), true);
+    }
+
+    /**
      * Show the modal for entering the subtask name.
      *
      * @return HTML response

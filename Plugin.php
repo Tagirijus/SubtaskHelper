@@ -22,11 +22,16 @@ class Plugin extends Base
             'template:task:sidebar:actions',
             'SubtaskHelper:task_sidebar/subtaskhelper_combine_button'
         );
+        $this->template->hook->attach(
+            'template:config:sidebar', 'SubtaskHelper:config/subtaskhelper_config_sidebar');
 
         // Reference hook
-        $this->hook->on('model:subtask:creation:prepare', function ($values) {
-            // $this->logger->info(json_encode($values));
+        $this->hook->on('model:subtask:creation:prepare', function (&$values) {
+            return $this->helper->subtaskHelperHelper->prepareSubtaskByTimesSyntax($values);
         });
+
+        // Extra Page - Routes
+        $this->route->addRoute('/subtaskhelper/config', 'SubtaskHelperController', 'showConfig', 'SubtaskHelper');
     }
 
     public function onStartup()
