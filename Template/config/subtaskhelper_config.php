@@ -1,7 +1,7 @@
 <div class="page-header">
-    <h2><?= t('HoursView configuration') ?></h2>
+    <h2><?= t('Subtaskhelper configuration') ?></h2>
 </div>
-<form method="post" action="<?= $this->url->href('HoursViewController', 'saveConfig', ['plugin' => 'HoursView']) ?>" autocomplete="off">
+<form method="post" action="<?= $this->url->href('SubtaskHelperController', 'saveConfig', ['plugin' => 'SubtaskHelper']) ?>" autocomplete="off">
     <?= $this->form->csrf() ?>
 
     <br>
