@@ -30,14 +30,6 @@
 
         <div class="task-form-main-column">
             <?= $this->form->label(t('Subtask'), 'subtask') ?>
-            <!-- Maybe uncomment the following so that I can tab into the select -->
-            <!-- <input
-                type="text"
-                value=""
-                class="input"
-                placeholder="workaround for autofocus"
-                autofocus
-            > -->
             <?= $this->form->select('subtask', $prepared_subtasks, $values, [], ['autofocus']) ?>
         </div>
 
