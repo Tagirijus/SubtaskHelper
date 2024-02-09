@@ -1,6 +1,14 @@
 # Changelog
 
 
+## v1.3
+
+### What's Changed
+
+_(most recent changes are listed on top):_
+- Added feature to remove all subtasks
+
+
 ## v1.2
 
 ### What's Changed
