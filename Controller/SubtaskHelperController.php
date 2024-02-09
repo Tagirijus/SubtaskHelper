@@ -131,6 +131,29 @@ class SubtaskHelperController extends \Kanboard\Controller\PluginController
     }
 
     /**
+     * Show the modal for asking to remove all subtasks.
+     *
+     * @return HTML response
+     */
+    public function removeAllModal()
+    {
+        $task = $this->getTask();
+        $subtasks = $this->subtaskModel->getAllByTaskIds([$task['id']]);
+        $user = $this->getUser();
+
+        if ($user['username'] !== $task['assignee_username']) {
+            throw new AccessForbiddenException();
+        }
+
+        $this->response->html($this->template->render(
+            'SubtaskHelper:task_sidebar/subtaskhelper_removeall_modal', [
+                'task' => $task,
+                'user' => $user
+            ]
+        ));
+    }
+
+    /**
      * Execute the combiner feature.
      */
     public function combineExecute()
@@ -212,5 +235,34 @@ class SubtaskHelperController extends \Kanboard\Controller\PluginController
             'task' => $task,
         )));
         // return $this->response->redirect($this->helper->url->to('SubtaskController', 'edit', ['task_id' => $task['id'], 'subtask_id' => $form['subtask']]), true);
+    }
+
+    /**
+     * Remove all subtasks for the task.
+     *
+     * @return HTML response
+     */
+    public function removeAllSubtasks()
+    {
+        if ($this->request->getStringParam('confirmation') === 'yes') {
+            $task = $this->getTask();
+            $subtasks = $this->subtaskModel->getAllByTaskIds([$task['id']]);
+            if ($subtasks) {
+                $success = true;
+                foreach ($subtasks as $subtask) {
+                    if (!$this->subtaskModel->remove($subtask['id'])) {
+                        $success = false;
+                    }
+                }
+                if ($success) {
+                    $this->flash->success(t('All subtasks removed'));
+                } else {
+                    $this->flash->success(t('Could not remove all subtasks'));
+                }
+            } else {
+                $this->flash->failure(t('No subtasks available'));
+            }
+        }
+        return $this->response->redirect($this->helper->url->to('TaskViewController', 'show', ['task_id' => $task['id']]), true);
     }
 }

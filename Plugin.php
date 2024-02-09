@@ -23,12 +23,16 @@ class Plugin extends Base
             'SubtaskHelper:task_sidebar/subtaskhelper_combine_button'
         );
         $this->template->hook->attach(
-            'template:config:sidebar',
-            'SubtaskHelper:config/subtaskhelper_config_sidebar'
+            'template:task:sidebar:actions',
+            'SubtaskHelper:task_sidebar/edit_subtask_button'
         );
         $this->template->hook->attach(
             'template:task:sidebar:actions',
-            'SubtaskHelper:task_sidebar/edit_subtask_button'
+            'SubtaskHelper:task_sidebar/subtaskhelper_removeall_button'
+        );
+        $this->template->hook->attach(
+            'template:config:sidebar',
+            'SubtaskHelper:config/subtaskhelper_config_sidebar'
         );
 
         // Reference hook
