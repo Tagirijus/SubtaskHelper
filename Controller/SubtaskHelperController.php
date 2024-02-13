@@ -172,12 +172,17 @@ class SubtaskHelperController extends \Kanboard\Controller\PluginController
 
         if ($subtasks) {
             $done_subtasks = $this->helper->subtaskHelperHelper->getDoneSubtasks($subtasks);
-            if ($done_subtasks) {
+            $started_subtasks = $this->helper->subtaskHelperHelper->getStartedSubtasks($subtasks);
+            if ($done_subtasks || $started_subtasks) {
                 $form = $this->request->getValues();
-                $new_subtask = $this->helper->subtaskHelperHelper->combineSubtaskFromSubtasks($task, $form['subtaskName'], $done_subtasks);
+                $new_subtask = $this->helper->subtaskHelperHelper->combineSubtaskFromSubtasks(
+                    $task, $form['subtaskName'], $done_subtasks, $started_subtasks
+                );
                 if ($this->subtaskModel->update($new_subtask, false)) {
                     // only remove other tasks, if new subtask creation is successful
-                    $this->helper->subtaskHelperHelper->removeSubtasks($done_subtasks, $new_subtask['id']);
+                    $this->helper->subtaskHelperHelper->removeDoneSubtasks($done_subtasks, $new_subtask['id']);
+                    // also adjust started tasks only, if the new subtask creation was successful
+                    $this->helper->subtaskHelperHelper->adjustStartedSubtasks($started_subtasks);
                     $this->flash->success(t('Subtask combined from done subtasks'));
                 } else {
                     $this->flash->failure(t('Could not combined subtask from done subtasks'));

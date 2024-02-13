@@ -11,7 +11,7 @@ return array(
     'Unable to convert to subtask' => 'Kann nicht zur Teilaufgabe konvertieren',
     'Subtask converted from task' => 'Teilaufgabe von Aufgabe konvertiert',
     'Task already has subtasks' => 'Aufgabe hat bereits Teilaufgaben',
-    'Enter name for the combining subtask, which will get the done subtask times summarized' => 'Name für die kombinierende Teilaufgabe eingeben, die alle erledigten Teilaufgaben-Zeiten summiert bekommt',
+    'Enter name for the combining subtask, which will combine done or tarted work of other subtasks. Done subtasks will be sumarized in this and be deleted afterwards. Started yet not done subtasks will add their spent time to the combined subtask and leave their remaining time.' => 'Name für die kombinierende Teilaufgabe eingeben, die alle erledigten Teilaufgaben-Zeiten summiert bekommt. Erledigte Subtasks werden darin summiert und danach selbst gelöscht. Gestartete und noch nicht erledigte Subtasks fügen ihre getätigte Zeit im neuen kombinierten Subtask hinzu und behalten ihre Restzeit.',
     'No subtasks available' => 'Keine Teilaufgaben verfügbar',
     'Subtask combined from done subtasks' => 'Teilaufgabe kombiniert von erledigten Teilaufgaben',
     'Subtask combined from done subtasks' => 'Teilaufgabe von erledigten Teilaufgaben kombiniert',

@@ -7,6 +7,7 @@
 
 _(most recent changes are listed on top):_
 - HoursView _ignore subtask title_ config will be used for the default combining subtask name now
+- Subtask combiner will now consider started subtasks and count spent time into combined tasks and split the remaining of into the started task
 
 
 ## v1.3

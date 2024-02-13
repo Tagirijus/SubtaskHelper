@@ -38,6 +38,23 @@ class SubtaskHelperHelper extends Base
     }
 
     /**
+     * Get only the started subtasks from the given subtasks.
+     *
+     * @param  array $subtasks
+     * @return array
+     */
+    public function getStartedSubtasks($subtasks)
+    {
+        $out = [];
+        foreach ($subtasks as $subtask) {
+            if ($subtask['status'] == 1) {
+                $out[] = $subtask;
+            }
+        }
+        return $out;
+    }
+
+    /**
      * Create some kind of a new subtask from all the given
      * subtasks and sum up their times. Except it will
      * use the first subtask for it to not always create
@@ -45,12 +62,31 @@ class SubtaskHelperHelper extends Base
      *
      * @param  array $task
      * @param  string $title
-     * @param  array $subtasks
+     * @param  array $done_subtasks
+     * @param  array $started_subtasks
      * @return array
      */
-    public function combineSubtaskFromSubtasks($task, $title, $subtasks)
+    public function combineSubtaskFromSubtasks($task, $title, $done_subtasks, $started_subtasks)
     {
-        $lowest_position = $this->getIdForLowestPositionSubtask($subtasks);
+        $out = $this->prepareCombinedSubtask($task, $title, $done_subtasks);
+        $out = $this->combineSubtaskFromDoneSubtasks($out, $done_subtasks);
+        $out = $this->combineSubtaskFromStartedSubtasks($out, $started_subtasks);
+        return $out;
+    }
+
+    /**
+     * Generate a new array, which will be the combined subtask
+     * later. It might be a new subtask or it might even be
+     * an existing one to not have a new subtask id for every
+     * combining of subtasks.
+     *
+     * @param  array $task
+     * @param  string $title
+     * @param  array $done_subtasks
+     * @return array
+     */
+    public function prepareCombinedSubtask($task, $title, $done_subtasks)
+    {
         $out = [
             'title' => $title,
             'status' => 2,
@@ -58,57 +94,111 @@ class SubtaskHelperHelper extends Base
             'time_spent' => 0,
             'user_id' => null,
             'task_id' => $task['id'],
-            'position' => $lowest_position,
+            'position' => -1,
             'id' => null,
         ];
-        foreach ($subtasks as $subtask) {
-            $out['time_estimated'] += $subtask['time_estimated'];
-            $out['time_spent'] += $subtask['time_spent'];
-            if ($subtask['position'] == $lowest_position) {
-                // this one is a bit tricky, since it basically just will
-                // get the "first user id" in this iteration. this is not
-                // quite the best solution, but its something ...
+        // basically this will use the lowest done subtask instead
+        // of creating a new subtask for the combined subtask later.
+        // this way a new subtask won't be created for every
+        // combining of subtask to save a little Sql DB ids in the
+        // subtasks table. it might be really pre-mature optimization
+        // however ...
+        foreach ($done_subtasks as $subtask) {
+            // find a subtask with a lower position and use
+            // its position and ids
+            if ($out['position'] == -1 || $subtask['position'] < $out['position']) {
+                $out['position'] = $subtask['position'];
                 $out['user_id'] = $subtask['user_id'];
-                // also this line is needed to use the subtask in the
-                // first position to later not create a new one
                 $out['id'] = $subtask['id'];
             }
         }
-        return $out;
-    }
-
-    /**
-     * Output the id of the subtask with th lowest position.
-     *
-     * @param  array $subtasks
-     * @return integer
-     */
-    public function getIdForLowestPositionSubtask($subtasks)
-    {
-        $out = 999;
-        foreach ($subtasks as $subtask) {
-            if ($subtask['position'] < $out) {
-                $out = $subtask['position'];
-            }
+        // maybeeeee ... create a new subtask, since there is no
+        // existing done subtask
+        if (empty($done_subtasks)) {
+            $id = $this->subtaskModel->create($out);
+            $out['id'] = $id;
         }
         return $out;
     }
 
     /**
-     * Remove all the subtasks of the given array,
-     * except the one in the first position.
+     * Get the times from the done subtasks and add them into
+     * the new subtask.
      *
-     * @param  array $subtasks
+     * @param  array $new_subtasks
+     * @param  array $done_subtasks
+     * @return array
+     */
+    public function combineSubtaskFromDoneSubtasks($new_subtask, $done_subtasks)
+    {
+        foreach ($done_subtasks as $subtask) {
+            $new_subtask['time_estimated'] += $subtask['time_estimated'];
+            $new_subtask['time_spent'] += $subtask['time_spent'];
+        }
+        return $new_subtask;
+    }
+
+    /**
+     * Get the times from the started subtasks and add them into
+     * the new subtask. This time use the spent times for both:
+     * estimated and spent, since the tasks are still running.
+     *
+     * @param  array $new_subtasks
+     * @param  array $started_subtasks
+     * @return array
+     */
+    public function combineSubtaskFromStartedSubtasks($new_subtask, $started_subtasks)
+    {
+        foreach ($started_subtasks as $subtask) {
+            $new_subtask['time_estimated'] += $subtask['time_spent'];
+            $new_subtask['time_spent'] += $subtask['time_spent'];
+            if (is_null($new_subtask['user_id'])) {
+                $new_subtask['user_id'] = $subtask['user_id'];
+            }
+        }
+        return $new_subtask;
+    }
+
+    /**
+     * Remove all the done subtasks of the given array,
+     * except the one with the given id.
+     *
+     * @param  array $done_subtasks
      * @param  integer $exceptID
      * @return bool
      */
-    public function removeSubtasks($subtasks, $exceptID = 0)
+    public function removeDoneSubtasks($done_subtasks, $exceptID = 0)
     {
-        foreach ($subtasks as $subtask) {
+        foreach ($done_subtasks as $subtask) {
             if ($subtask['id'] != $exceptID) {
                 if (!$this->subtaskModel->remove($subtask['id'])) {
                     return false;
                 }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Adjust the times of the started subtasks to have
+     * none time spent anymor and the estimated times
+     * are the estimation - spent.
+     *
+     * @param  array $started_subtasks
+     * @return bool
+     */
+    public function adjustStartedSubtasks($started_subtasks)
+    {
+        foreach ($started_subtasks as $subtask) {
+            $subtask_updated = [
+                'id' => $subtask['id'],
+                'time_estimated' => $subtask['time_estimated'],
+                'time_spent' => $subtask['time_spent'],
+            ];
+            $subtask_updated['time_estimated'] -= $subtask_updated['time_spent'];
+            $subtask_updated['time_spent'] = 0.0;
+            if (!$this->subtaskModel->update($subtask_updated, false)) {
+                return false;
             }
         }
         return true;

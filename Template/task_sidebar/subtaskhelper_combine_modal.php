@@ -16,7 +16,7 @@
             ]) ?>
 
             <p style="font-style: italic; font-size: .75em; opacity: .75; margin-top: 1em;">
-                <?= t('Enter name for the combining subtask, which will get the done subtask times summarized') ?>
+                <?= t('Enter name for the combining subtask, which will combine done or tarted work of other subtasks. Done subtasks will be sumarized in this and be deleted afterwards. Started yet not done subtasks will add their spent time to the combined subtask and leave their remaining time.') ?>
             </p>
         </div>
 
