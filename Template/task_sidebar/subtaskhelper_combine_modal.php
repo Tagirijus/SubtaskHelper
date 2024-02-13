@@ -10,7 +10,7 @@
 
         <div class="task-form-main-column">
             <?= $this->form->label(t('Subtask name'), 'subtaskName') ?>
-            <?= $this->form->text('subtaskName', [], [], [
+            <?= $this->form->text('subtaskName', ['subtaskName' => $subtaskName], [], [
                 'autofocus',
                 'required',
             ]) ?>

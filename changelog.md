@@ -1,6 +1,14 @@
 # Changelog
 
 
+## v1.4
+
+### What's Changed
+
+_(most recent changes are listed on top):_
+- HoursView _ignore subtask title_ config will be used for the default combining subtask name now
+
+
 ## v1.3
 
 ### What's Changed

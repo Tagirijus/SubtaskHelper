@@ -117,6 +117,12 @@ class SubtaskHelperController extends \Kanboard\Controller\PluginController
         $task = $this->getTask();
         $subtasks = $this->subtaskModel->getAllByTaskIds([$task['id']]);
         $user = $this->getUser();
+        $default_name = explode(',', $this->configModel->get('hoursview_ignore_subtask_titles', ''));
+        if (count($default_name) > 0) {
+            $default_name = $default_name[0];
+        } else {
+            $default_name = '';
+        }
 
         if ($user['username'] !== $task['assignee_username']) {
             throw new AccessForbiddenException();
@@ -125,7 +131,8 @@ class SubtaskHelperController extends \Kanboard\Controller\PluginController
         $this->response->html($this->template->render(
             'SubtaskHelper:task_sidebar/subtaskhelper_combine_modal', [
                 'task' => $task,
-                'user' => $user
+                'user' => $user,
+                'subtaskName' => $default_name
             ]
         ));
     }
