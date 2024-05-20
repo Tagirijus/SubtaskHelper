@@ -150,7 +150,7 @@ class SubtaskHelperHelper extends Base
     public function combineSubtaskFromStartedSubtasks($new_subtask, $started_subtasks)
     {
         foreach ($started_subtasks as $subtask) {
-            $new_subtask['time_estimated'] += $subtask['time_estimated'];
+            $new_subtask['time_estimated'] += $subtask['time_spent'];
             $new_subtask['time_spent'] += $subtask['time_spent'];
             if (is_null($new_subtask['user_id'])) {
                 $new_subtask['user_id'] = $subtask['user_id'];
