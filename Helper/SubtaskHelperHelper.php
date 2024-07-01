@@ -140,8 +140,48 @@ class SubtaskHelperHelper extends Base
 
     /**
      * Get the times from the started subtasks and add them into
-     * the new subtask. This time use the spent times for both:
-     * estimated and spent, since the tasks are still running.
+     * the new subtask.
+     *
+     * There are two cases now for a running subtask:
+     *   1. The estimated time is not reached yet.
+     *   2. The spent time is higher than estimated
+     *
+     * The logic now is to use the spent time for adding to
+     * spent AND estimated, if the estimated time is not
+     * reached yet. The logic is that the subtask will still
+     * have estimated time left, thus estimated being higher
+     * than spent. And I do not want to add the estimated
+     * time, if it "is not done yet".
+     *
+     * The other case is that spent is higher than estimated.
+     * In that case I consider the estimated reached (obviously),
+     * thus it is mandatory to separate both. The idea is that
+     * I want to keep track how much I estimated in the first
+     * place. Thus I cannot simply add the spent time as
+     * estimated, if the subtask already is some kind of "overdue".
+     * I want to keep this information of mis-calculating in the end.
+     *
+     * Example:
+     *   [DONE] done          1:00 / 1:00
+     *   [WIP]  still to do   0:30 / 1:00
+     *
+     * This will convert after grouping into:
+     *   [DONE] done          1:30 / 1:30
+     *   [WIP]  still to do   0:00 / 0:30
+     *
+     * And this means that I added the 30 mins to done for both
+     * and still have it left on the estimated for the open task.
+     *
+     * Now this happens:
+     *   [DONE] done          1:30 / 1:30
+     *   [DONE] still to do   1:00 / 0:30
+     *
+     * And this will be combined this way:
+     *   [DONE] done          2:30 / 2:00
+     *
+     * The logic here is that I worked 30 minutes too much according
+     * to the first estimation. And I want this to be reflected in
+     * the grouped / combined "done" task.
      *
      * @param  array $new_subtasks
      * @param  array $started_subtasks
@@ -150,8 +190,13 @@ class SubtaskHelperHelper extends Base
     public function combineSubtaskFromStartedSubtasks($new_subtask, $started_subtasks)
     {
         foreach ($started_subtasks as $subtask) {
-            $new_subtask['time_estimated'] += $subtask['time_spent'];
-            $new_subtask['time_spent'] += $subtask['time_spent'];
+            if ($subtask['time_spent'] > $subtask['time_estimated']) {
+                $new_subtask['time_estimated'] += $subtask['time_estimated'];
+                $new_subtask['time_spent'] += $subtask['time_spent'];
+            } else {
+                $new_subtask['time_estimated'] += $subtask['time_spent'];
+                $new_subtask['time_spent'] += $subtask['time_spent'];
+            }
             if (is_null($new_subtask['user_id'])) {
                 $new_subtask['user_id'] = $subtask['user_id'];
             }
