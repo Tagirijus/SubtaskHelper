@@ -39,9 +39,21 @@ class Plugin extends Base
         $this->hook->on('model:subtask:creation:prepare', function (&$values) {
             return $this->helper->subtaskHelperHelper->prepareSubtaskByTimesSyntax($values);
         });
+        $this->hook->on('model:task:creation:aftersave', function ($task_id) {
+            return $this->container['subtaskHelperController']->parseSubtasksOnTaskCreation($task_id);
+        });
 
         // Extra Page - Routes
         $this->route->addRoute('/subtaskhelper/config', 'SubtaskHelperController', 'showConfig', 'SubtaskHelper');
+    }
+
+    public function getClasses()
+    {
+        return [
+            'Plugin\SubtaskHelper\Controller' => [
+                'SubtaskHelperController',
+            ]
+        ];
     }
 
     public function onStartup()

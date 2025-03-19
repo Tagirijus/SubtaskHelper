@@ -277,4 +277,20 @@ class SubtaskHelperController extends \Kanboard\Controller\PluginController
         }
         return $this->response->redirect($this->helper->url->to('TaskViewController', 'show', ['task_id' => $task['id']]), true);
     }
+
+    /**
+     * Parse the description text of the created task and split the part
+     * underneath the last "---" string to be interpeted as if it came
+     * from the "add subtasks" modal.
+     *
+     * @param  integer $task_id
+     */
+    public function parseSubtasksOnTaskCreation($task_id)
+    {
+        $task = $this->taskFinderModel->getDetails($task_id);
+        $description = $task['description'];
+
+        // TODO
+        // $this->logger->info(json_encode($description));
+    }
 }

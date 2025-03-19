@@ -4,6 +4,8 @@
 
 With this plugin I added some new functions on the task site. It will help e.g. generating a subtask with the already entered times (estimated & spent) from the main task. Also there is the option to combine already done subtasks into one.
 
+In the next version (coding it after I write this) it should be possible to enter subtask in the main task description field (underneath the last "---" string) so that they get parsed as in the "add subtasks" modal.
+
 
 Screenshots
 ----------
