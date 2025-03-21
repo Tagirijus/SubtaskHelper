@@ -35,6 +35,13 @@ class Plugin extends Base
             'SubtaskHelper:config/subtaskhelper_config_sidebar'
         );
 
+        // View - Task Creation Modal Hooks
+        $this->template->hook->attach(
+            'template:task:form:first-column',
+            'SubtaskHelper:task_creation_modal/subtasks_in_description'
+        );
+
+
         // Reference hook
         $this->hook->on('model:subtask:creation:prepare', function (&$values) {
             return $this->helper->subtaskHelperHelper->prepareSubtaskByTimesSyntax($values);

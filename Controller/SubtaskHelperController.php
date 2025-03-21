@@ -287,10 +287,22 @@ class SubtaskHelperController extends \Kanboard\Controller\PluginController
      */
     public function parseSubtasksOnTaskCreation($task_id)
     {
+        $user = $this->getUser();
         $task = $this->taskFinderModel->getDetails($task_id);
         $description = $task['description'];
 
-        // TODO
-        // $this->logger->info(json_encode($description));
+        list($description_only, $subtasks) =
+                $this->helper->subtaskHelperHelper->splitSubtasksInTaskDescription($description);
+
+        if ($this->helper->subtaskHelperHelper->descriptionContainsSubtasks($description)) {
+            $subtasks_parsed = $this->helper->subtaskHelperHelper->parseSubtasks($subtasks, $task_id, $user['id']);
+            foreach ($subtasks_parsed as $subtask) {
+                $this->subtaskModel->create($subtask);
+            }
+            $this->taskModificationModel->update([
+                'id' => $task_id,
+                'description' => $description_only
+            ]);
+        }
     }
 }

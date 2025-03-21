@@ -302,4 +302,74 @@ class SubtaskHelperHelper extends Base
 
         return (float) $time;
     }
+
+    /**
+     * A simple check to see, if there probably are subtasks in the description
+     * or not. This is done by checking if there is a "---" string with
+     * no direct empty line after it. So e.g. "---\nSubtask" would return
+     * true, while "---\n\nMore text here" would return false.
+     *
+     * @param  string $description
+     * @return boolean
+     */
+    public function descriptionContainsSubtasks($description)
+    {
+        $pattern = '/\R---\R[^\r\n]+/';
+        return (bool) preg_match($pattern, $description);
+    }
+
+    /**
+     * Split into two parts, whereas "---" is splitting
+     * the string, while it has to be the last "---" in that
+     * string.
+     *
+     * The method returns and array with:
+     * [
+     *   0 => upper description part,
+     *   1 => subtasks array
+     *        (this is the subtask string splitted
+     *         by newlines already)
+     * ]
+     *
+     * @param  string $description
+     * @return array
+     */
+    public function splitSubtasksInTaskDescription($description)
+    {
+        $splitter = '---';
+        $pos = strrpos($description, $splitter);
+        if ($pos !== false) {
+            $description_only = trim(substr($description, 0, $pos));
+            $subtasks_string = trim(substr($description, $pos + strlen($splitter)));
+            $subtasks = preg_split('/\R/', $subtasks_string);
+            return [$description_only, $subtasks];
+        } else {
+            return [$description, []];
+        }
+    }
+
+    /**
+     * Get the subtasks lines given from the description text underneath the "---"
+     * as an array for each line and then converts them into subtasks arrays
+     * for Kanboard.
+     *
+     * @param  array $subtasks
+     * @param  integer $task_id
+     * @param  integer $user_id
+     * @return array
+     */
+    public function parseSubtasks($subtasks, $task_id, $user_id)
+    {
+        $subtasks_parsed = [];
+        foreach ($subtasks as $subtask_line) {
+            $tmp_subtask = [
+                'title' => $subtask_line,
+                'task_id' => $task_id,
+                'time_estimated' => '',
+                'user_id' => $user_id,
+            ];
+            $subtasks_parsed[] = $this->prepareSubtaskByTimesSyntax($tmp_subtask);
+        }
+        return $subtasks_parsed;
+    }
 }

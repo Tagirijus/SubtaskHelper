@@ -26,4 +26,6 @@ return array(
     'Do you really want to remove all subtasks?' => 'Wirklich alle Subtasks löschen?',
     'All subtasks removed' => 'Alle Subtasks gelöscht',
     'Could not remove all subtasks' => 'Konnte nicht alle Subtasks löschen',
+    "E.g.:\nDescription\n---\nSubtask:0:30\nSubtask 2:0:45" => "Z.B.:\nBeschreibung\n---\nSubtask:0:30\nSubtask 2:0:45",
+    'Description text can contain "---" and directly subtasks underneath it with just a single newline.' => 'Beschreibungstext kann "---" und Subtask direkt mit nur einer Newline enthalten.',
 );
